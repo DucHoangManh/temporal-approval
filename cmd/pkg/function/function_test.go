@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"approval-demo/cmd/internal/activity"
+	"approval-demo/internal/activity"
 )
 
 func Test_GetFunctionName(t *testing.T) {

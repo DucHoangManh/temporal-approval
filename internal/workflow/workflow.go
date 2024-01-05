@@ -3,11 +3,11 @@ package workflow
 import (
 	"time"
 
-	"approval-demo/cmd/internal/activity"
+	activity2 "approval-demo/internal/activity"
 	"go.temporal.io/sdk/workflow"
 )
 
-func ApprovalRequiredWorkflow(ctx workflow.Context, definition ApprovalDefinition, payload activity.PostApproveActionPayload) error {
+func ApprovalRequiredWorkflow(ctx workflow.Context, definition ApprovalDefinition, payload activity2.PostApproveActionPayload) error {
 	logger := workflow.GetLogger(ctx)
 	if err := approvalWorkflow(ctx, &definition); err != nil {
 		logger.Error("approvalWorkflow failed.", "Error", err)
@@ -24,7 +24,7 @@ func ApprovalRequiredWorkflow(ctx workflow.Context, definition ApprovalDefinitio
 		},
 	)
 	// should handle workflow cancellation
-	if err := workflow.ExecuteActivity(ctx, activity.PostApproveActivity, payload).Get(ctx, nil); err != nil {
+	if err := workflow.ExecuteActivity(ctx, activity2.PostApproveActivity, payload).Get(ctx, nil); err != nil {
 		logger.Error("ExecuteActivity failed.", "Error", err)
 		return err
 	}

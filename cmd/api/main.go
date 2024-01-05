@@ -6,8 +6,8 @@ import (
 	"math/rand"
 	"net/http"
 
-	"approval-demo/cmd/internal/activity"
-	"approval-demo/cmd/internal/workflow"
+	"approval-demo/internal/activity"
+	workflow2 "approval-demo/internal/workflow"
 	"github.com/gin-gonic/gin"
 	"go.temporal.io/sdk/client"
 )
@@ -26,14 +26,14 @@ func main() {
 		"/approvals", func(context *gin.Context) {
 			workflowOptions := client.StartWorkflowOptions{
 				ID:                                       fmt.Sprintf("approval-workflow-%v", rand.Int()),
-				TaskQueue:                                workflow.TaskQueueName,
+				TaskQueue:                                workflow2.TaskQueueName,
 				WorkflowExecutionErrorWhenAlreadyStarted: true,
 			}
 			_, err := temporalClient.ExecuteWorkflow(
 				context.Request.Context(),
 				workflowOptions,
-				workflow.ApprovalRequiredWorkflow,
-				workflow.DefaultApprovalDefinition,
+				workflow2.ApprovalRequiredWorkflow,
+				workflow2.DefaultApprovalDefinition,
 				activity.PostApproveActionPayload{Id: rand.Int()},
 			)
 			if err != nil {
@@ -55,7 +55,7 @@ func main() {
 				context.JSON(500, gin.H{"message": err.Error()})
 				return
 			}
-			var queryResponse workflow.ApprovalDefinition
+			var queryResponse workflow2.ApprovalDefinition
 			err = queryResult.Get(&queryResponse)
 			if err != nil {
 				context.JSON(500, gin.H{"message": err.Error()})
@@ -76,8 +76,8 @@ func main() {
 				context.Request.Context(),
 				workflowID,
 				"",
-				workflow.ApprovalSignal,
-				workflow.ApprovalUser{
+				workflow2.ApprovalSignal,
+				workflow2.ApprovalUser{
 					Email:    request.Email,
 					Approved: request.Approved,
 				},
