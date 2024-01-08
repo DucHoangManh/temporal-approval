@@ -24,22 +24,24 @@ func main() {
 	router := gin.Default()
 	router.POST(
 		"/approvals", func(context *gin.Context) {
+			cId := rand.Int()
 			workflowOptions := client.StartWorkflowOptions{
-				ID:                                       fmt.Sprintf("approval-workflow-%v", rand.Int()),
+				ID:                                       fmt.Sprintf("approval-workflow-%v", cId),
 				TaskQueue:                                workflow2.TaskQueueName,
 				WorkflowExecutionErrorWhenAlreadyStarted: true,
 			}
-			_, err := temporalClient.ExecuteWorkflow(
+			workflowRun, err := temporalClient.ExecuteWorkflow(
 				context.Request.Context(),
 				workflowOptions,
 				workflow2.ApprovalRequiredWorkflow,
 				workflow2.DefaultApprovalDefinition,
-				activity.PostApproveActionPayload{Id: rand.Int()},
+				activity.PostApproveActionPayload{Id: cId},
 			)
 			if err != nil {
 				context.JSON(500, gin.H{"message": err.Error()})
 				return
 			}
+			context.JSON(200, gin.H{"workflowID": workflowRun.GetID()})
 		},
 	)
 	router.GET(
